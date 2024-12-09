@@ -1,4 +1,4 @@
-import { PlusIcon, Trash } from "lucide-react";
+import { PlusIcon, Trash, Pencil, Check } from "lucide-react";
 import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 
@@ -10,13 +10,15 @@ const todos = [
   },
   {
     id: uuidv4(),
-    task: "Write unit tests', completed",
+    task: "Write unit tests",
     completed: true,
   },
 ];
 function App() {
   const [todo, setTodo] = useState(todos);
   const [addTodo, setAddTodo] = useState("");
+  const [showIcon, setShowIcon] = useState(false);
+  const [edit, setEdit] = useState(null);
 
   const handleAddTodo = () => {
     if (addTodo === "") return;
@@ -46,6 +48,23 @@ function App() {
       });
     });
   };
+
+  const handleEditTodo = (id) => {
+    const getTodo = todo.find((item) => item.id === id);
+    setAddTodo(getTodo.task);
+    setShowIcon(true);
+    setEdit(id);
+  };
+
+  const handleUpdateEditedTodo = () => {
+    const editedTodoItem = todo.map((item) =>
+      item.id === edit ? { ...item, task: addTodo } : item
+    );
+    setShowIcon(false);
+    setTodo(editedTodoItem);
+    setAddTodo("");
+  };
+
   return (
     <>
       <div className="flex items-center justify-center h-dvh bg-gray-900">
@@ -61,17 +80,27 @@ function App() {
               <input
                 type="text"
                 value={addTodo}
-                className="bg-transparent focus:outline-none p-3 pl-0 text-black flex-1"
-                placeholder="Add task..."
+                className="bg-transparent focus:outline-none p-3 pl-0 text-black w-full md:w-72"
+                placeholder="Add task...."
                 onChange={(e) => setAddTodo(e.target.value)}
               />
-              <button
-                type="button"
-                className="rounded-lg bg-green-400 transition-all duration-300 size-9 md:size-10 ease-in-out hover:bg-green-500 flex justify-center items-center text-base text-green-800"
-                onClick={handleAddTodo}
-              >
-                <PlusIcon className="size-5" />
-              </button>
+              {showIcon ? (
+                <button
+                  type="button"
+                  className="rounded-lg bg-green-400 transition-all duration-300 size-9 md:size-10 ease-in-out hover:bg-green-500 flex justify-center items-center text-base text-green-800"
+                  onClick={handleUpdateEditedTodo}
+                >
+                  <Check className="size-5" />
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  className="rounded-lg bg-green-400 transition-all duration-300 size-9 md:size-10 ease-in-out hover:bg-green-500 flex justify-center items-center text-base text-green-800"
+                  onClick={handleAddTodo}
+                >
+                  <PlusIcon className="size-5" />
+                </button>
+              )}
             </div>
           </div>
 
@@ -86,14 +115,14 @@ function App() {
                 className="flex items-center w-full justify-between rounded-xl bg-slate-100 px-3 md:px-5 py-2 md:py-3"
                 key={todoItem.id}
               >
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 md:gap-3">
                   <input
                     type="checkbox"
                     onChange={() => handleTodoCompleted(todoItem.id)}
-                    checked={todoItem.completed}
+                    checked={todoItem.completed || false}
                   />
                   <p
-                    className={`text-black text-base font-medium capitalize ${
+                    className={`text-black text-sm md:text-base font-medium capitalize line-clamp-3 ${
                       todoItem.completed
                         ? "line-through bg-green-200 px-2 rounded border border-green-500"
                         : ""
@@ -102,13 +131,22 @@ function App() {
                     {todoItem.task}
                   </p>
                 </div>
-                <button
-                  type="button"
-                  className="rounded-lg bg-red-400 transition-all duration-300 size-9 md:size-10 ease-in-out hover:bg-red-500 flex justify-center items-center text-red-800 text-xs"
-                  onClick={() => handleRemoveTodo(todoItem.id)}
-                >
-                  <Trash className="size-5" />
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    className="rounded-lg bg-green-400 transition-all duration-300 size-9 md:size-10 ease-in-out hover:bg-green-500 flex justify-center items-center text-base text-green-800"
+                    onClick={() => handleEditTodo(todoItem.id)}
+                  >
+                    <Pencil className="size-5" />
+                  </button>
+                  <button
+                    type="button"
+                    className="rounded-lg bg-red-400 transition-all duration-300 size-9 md:size-10 ease-in-out hover:bg-red-500 flex justify-center items-center text-red-800 text-xs"
+                    onClick={() => handleRemoveTodo(todoItem.id)}
+                  >
+                    <Trash className="size-5" />
+                  </button>
+                </div>
               </div>
             ))}
           </div>
