@@ -90,10 +90,13 @@ function App() {
                   <input
                     type="checkbox"
                     onChange={() => handleTodoCompleted(todoItem.id)}
+                    checked={todoItem.completed}
                   />
                   <p
                     className={`text-black text-base font-medium capitalize ${
-                      todoItem.completed ? "line-through read-only:" : ""
+                      todoItem.completed
+                        ? "line-through bg-green-200 px-2 rounded border border-green-500"
+                        : ""
                     }`}
                   >
                     {todoItem.task}
